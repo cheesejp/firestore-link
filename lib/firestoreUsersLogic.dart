@@ -17,9 +17,9 @@ class FirestoreUsersLogic {
 
   void getUsers({int delayTime = 0}) async {
     await Future.delayed(Duration(seconds: delayTime));
-    QuerySnapshot list =
+    QuerySnapshot _list =
         await Firestore.instance.collection(_collectionId).getDocuments();
-    _listController.sink.add(list);
+    _listController.sink.add(_list);
   }
 
   // Future<void> newRecord(String lastName, String name, {int delayTime = 0}) {

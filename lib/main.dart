@@ -1,5 +1,4 @@
 import 'package:firestore_link/firestoreUsersLogic.dart';
-import 'package:firestore_link/firestoreUsersService.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -8,11 +7,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'BLoC Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter BLoC Demo Home Page'),
     );
   }
 }
@@ -26,6 +25,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  FirestoreUsersLogic _firestoreUsersLogic;
+
+  _MyHomePageState() {
+    this._firestoreUsersLogic = FirestoreUsersLogic();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,10 +41,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            UserForm(),
-            // _FirestoreUserName(),
-            // _FirestoreUsersList(),
-            _FirestoreUsersStreamList(),
+            UserForm(_firestoreUsersLogic),
+            _FirestoreUsersStreamList(_firestoreUsersLogic),
           ],
         ),
       ),
@@ -51,17 +54,15 @@ class UserForm extends StatelessWidget {
   final _formkey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final FirestoreUsersLogic _firestoreUsersLogic;
+
+  UserForm(this._firestoreUsersLogic);
 
   String requireValidation(value) {
     if (value.isEmpty) {
       return '必須です。';
     }
     return null;
-  }
-
-  void dispose() {
-    _nameController.dispose();
-    _lastNameController.dispose();
   }
 
   @override
@@ -96,17 +97,14 @@ class UserForm extends StatelessWidget {
               child: const Text('send'),
               onPressed: () {
                 if (_formkey.currentState.validate()) {
-                  // FirestoreUsersService()
-                  //     .newUser(_lastNameController.text, _nameController.text)
-
-                  FirestoreUsersLogic()
+                  _firestoreUsersLogic
                       .newUser(_lastNameController.text, _nameController.text)
                       .then((onValue) {
                     print('success!');
                   }).catchError((onError) {
                     print('error!');
                   }).whenComplete(() {
-                    FirestoreUsersLogic().getUsers();
+                    _firestoreUsersLogic.getUsers();
                     print('done.');
                   });
                 }
@@ -117,66 +115,23 @@ class UserForm extends StatelessWidget {
       ),
     );
   }
-}
 
-class _FirestoreUserName extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: FirestoreUsersService().getUser('taro', delayTime: 0),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text('error');
-        } else if (snapshot.hasData) {
-          return Text('${snapshot.data['last_name']} ${snapshot.data['name']}');
-        } else {
-          return Text('loading...');
-        }
-      },
-    );
-  }
-}
-
-class _FirestoreUsersList extends StatelessWidget {
-  dynamic rebuildList(context, snapshot) {
-    if (snapshot.hasError) {
-      return Text('error');
-    } else if (snapshot.hasData) {
-      final items = snapshot.data?.documents ?? [];
-      return SizedBox(
-        height: 200.0,
-        child: ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (context, index) => ListTile(
-                  title: Text('User'),
-                  subtitle: Text(items[index].data['last_name'] +
-                      ' ' +
-                      items[index].data['name']),
-                  isThreeLine: true,
-                )),
-      );
-    } else {
-      return Text('loading...');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: FirestoreUsersService().getUsers(delayTime: 0),
-      builder: (context, snapshot) {
-        return rebuildList(context, snapshot);
-      },
-    );
+  void dispose() {
+    _nameController.dispose();
+    _lastNameController.dispose();
   }
 }
 
 class _FirestoreUsersStreamList extends StatelessWidget {
+  final FirestoreUsersLogic _firestoreUsersLogic;
+
+  _FirestoreUsersStreamList(this._firestoreUsersLogic);
+
   dynamic rebuildList(context, snapshot) {
     if (snapshot.hasError) {
       return Text('error');
-    } else if (snapshot.hasData) {
-      final items = snapshot.data?.documents ?? [];
+    } else if (snapshot.connectionState == ConnectionState.active) {
+      var items = snapshot.data?.documents ?? [];
       return SizedBox(
         height: 200.0,
         child: ListView.builder(
@@ -197,7 +152,7 @@ class _FirestoreUsersStreamList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirestoreUsersLogic().list,
+      stream: _firestoreUsersLogic.list,
       builder: (context, snapshot) {
         return rebuildList(context, snapshot);
       },
