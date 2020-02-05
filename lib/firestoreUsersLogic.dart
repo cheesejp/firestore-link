@@ -10,11 +10,6 @@ class FirestoreUsersLogic {
     getUsers();
   }
 
-  // Future<DocumentSnapshot> getUser(String userId, {int delayTime = 0}) async {
-  //   await Future.delayed(Duration(seconds: delayTime));
-  //   return Firestore.instance.collection(_collectionId).document(userId).get();
-  // }
-
   void getUsers({int delayTime = 0}) async {
     await Future.delayed(Duration(seconds: delayTime));
     QuerySnapshot _list =
@@ -22,20 +17,31 @@ class FirestoreUsersLogic {
     _listController.sink.add(_list);
   }
 
-  // Future<void> newRecord(String lastName, String name, {int delayTime = 0}) {
-  //   Future.delayed(Duration(seconds: delayTime));
-  //   return Firestore.instance.collection(_collectionId).add({
-  //     'name': name,
-  //     'last_name': lastName,
-  //   });
-  // }
-
-  Future<void> newUser(String lastName, String name, {int delayTime = 0}) {
+  Future<void> newUser(String lastName, String name,
+      {String documentId = '', int delayTime = 0}) {
     Future.delayed(Duration(seconds: delayTime));
-    return Firestore.instance.collection(_collectionId).document(name).setData({
-      'name': name,
-      'last_name': lastName,
-    });
+    if (documentId.isEmpty) {
+      return Firestore.instance.collection(_collectionId).add({
+        'name': name,
+        'last_name': lastName,
+      });
+    } else {
+      return Firestore.instance
+          .collection(_collectionId)
+          .document(documentId)
+          .setData({
+        'name': name,
+        'last_name': lastName,
+      });
+    }
+  }
+
+  Future<void> deleteUser(String documentId, {int delayTime = 0}) async {
+    await Future.delayed(Duration(seconds: delayTime));
+    return Firestore.instance
+        .collection(_collectionId)
+        .document(documentId)
+        .delete();
   }
 
   void dispose() {

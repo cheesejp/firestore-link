@@ -1,5 +1,7 @@
 import 'package:firestore_link/firestoreUsersLogic.dart';
+import 'package:firestore_link/userDetail.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,7 +13,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter BLoC Demo Home Page'),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => MyHomePage(
+              title: 'Flutter BLoC Demo Home Page',
+            ),
+        '/userdetail': (context) => UserDetail(
+              title: 'User Detail Page',
+            ),
+      },
     );
   }
 }
@@ -127,22 +137,45 @@ class _FirestoreUsersStreamList extends StatelessWidget {
 
   _FirestoreUsersStreamList(this._firestoreUsersLogic);
 
-  dynamic rebuildList(context, snapshot) {
+  dynamic buildList(context, snapshot) {
     if (snapshot.hasError) {
       return Text('error');
     } else if (snapshot.connectionState == ConnectionState.active) {
-      var items = snapshot.data?.documents ?? [];
+      var documentSnapshots = snapshot.data?.documents ?? [];
       return SizedBox(
         height: 200.0,
         child: ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (context, index) => ListTile(
-                  title: Text('User'),
-                  subtitle: Text(items[index].data['last_name'] +
-                      ' ' +
-                      items[index].data['name']),
-                  isThreeLine: true,
-                )),
+            padding: EdgeInsets.all(8),
+            itemCount: documentSnapshots.length,
+            itemBuilder: (context, index) => Slidable(
+                    actionPane: SlidableDrawerActionPane(),
+                    actionExtentRatio: 0.25,
+                    child: ListTile(
+                      leading: Icon(Icons.tag_faces),
+                      title:
+                          Text('ID : ' + documentSnapshots[index].documentID),
+                      subtitle: Text(
+                          documentSnapshots[index].data['last_name'] +
+                              ' ' +
+                              documentSnapshots[index].data['name']),
+                      isThreeLine: true,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/userdetail',
+                            arguments: documentSnapshots[index]);
+                      },
+                    ),
+                    actions: <Widget>[
+                      IconSlideAction(
+                        caption: 'Delete',
+                        color: Colors.red,
+                        icon: Icons.delete,
+                        onTap: () {
+                          _firestoreUsersLogic
+                              .deleteUser(documentSnapshots[index].documentID);
+                          _firestoreUsersLogic.getUsers();
+                        },
+                      ),
+                    ])),
       );
     } else {
       return Text('loading...');
@@ -154,7 +187,7 @@ class _FirestoreUsersStreamList extends StatelessWidget {
     return StreamBuilder(
       stream: _firestoreUsersLogic.list,
       builder: (context, snapshot) {
-        return rebuildList(context, snapshot);
+        return buildList(context, snapshot);
       },
     );
   }
