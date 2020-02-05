@@ -1,5 +1,5 @@
-import 'package:firestore_link/firestoreUsersLogic.dart';
-import 'package:firestore_link/userDetail.dart';
+import 'package:firestore_link/firestore_users_logic.dart';
+import 'package:firestore_link/user_edit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => MyHomePage(
               title: 'Flutter BLoC Demo Home Page',
             ),
-        '/userdetail': (context) => UserDetail(
+        '/userdetail': (context) => UserEdit(
               title: 'User Detail Page',
             ),
       },
@@ -57,78 +57,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
-  }
-}
-
-class UserForm extends StatelessWidget {
-  final _formkey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final FirestoreUsersLogic _firestoreUsersLogic;
-
-  UserForm(this._firestoreUsersLogic);
-
-  String requireValidation(value) {
-    if (value.isEmpty) {
-      return '必須です。';
-    }
-    return null;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formkey,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            TextFormField(
-              controller: _lastNameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                filled: true,
-                hintText: '苗字を入力してください。',
-                labelText: '苗字',
-              ),
-              validator: requireValidation,
-            ),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                filled: true,
-                hintText: '名前を入力してください。',
-                labelText: '名前',
-              ),
-              validator: requireValidation,
-            ),
-            RaisedButton(
-              child: const Text('send'),
-              onPressed: () {
-                if (_formkey.currentState.validate()) {
-                  _firestoreUsersLogic
-                      .newUser(_lastNameController.text, _nameController.text)
-                      .then((onValue) {
-                    print('success!');
-                  }).catchError((onError) {
-                    print('error!');
-                  }).whenComplete(() {
-                    _firestoreUsersLogic.getUsers();
-                    print('done.');
-                  });
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void dispose() {
-    _nameController.dispose();
-    _lastNameController.dispose();
   }
 }
 
