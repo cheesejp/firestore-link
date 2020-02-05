@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirestoreUsersLogic {
+class FirestoreUsersBloc {
   static const String _collectionId = "users";
   final _listController = StreamController<QuerySnapshot>();
   Stream<QuerySnapshot> get list => _listController.stream;
 
-  FirestoreUsersLogic() {
+  FirestoreUsersBloc() {
     getUsers();
   }
 

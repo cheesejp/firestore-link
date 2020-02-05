@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firestore_link/firestore_users_logic.dart';
+import 'package:firestore_link/firestore_users_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class UserEdit extends StatelessWidget {
   final String title;
@@ -31,7 +32,7 @@ class UserEdit extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            UserForm(FirestoreUsersLogic()),
+            UserForm(),
             Text(document.documentID),
             Text(document.data['last_name']),
             Text(document.data['name']),
@@ -46,9 +47,6 @@ class UserForm extends StatelessWidget {
   final _formkey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
-  final FirestoreUsersLogic _firestoreUsersLogic;
-
-  UserForm(this._firestoreUsersLogic);
 
   String requireValidation(value) {
     if (value.isEmpty) {
@@ -59,6 +57,9 @@ class UserForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FirestoreUsersBloc bloc =
+        Provider.of<FirestoreUsersBloc>(context, listen: false);
+
     return Form(
       key: _formkey,
       child: Padding(
@@ -89,14 +90,15 @@ class UserForm extends StatelessWidget {
               child: const Text('send'),
               onPressed: () {
                 if (_formkey.currentState.validate()) {
-                  _firestoreUsersLogic
+                  bloc
                       .newUser(_lastNameController.text, _nameController.text)
                       .then((onValue) {
                     print('success!');
                   }).catchError((onError) {
                     print('error!');
                   }).whenComplete(() {
-                    _firestoreUsersLogic.getUsers();
+                    bloc.getUsers();
+                    Navigator.pop(context);
                     print('done.');
                   });
                 }
