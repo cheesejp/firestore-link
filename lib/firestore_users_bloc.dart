@@ -21,7 +21,7 @@ class FirestoreUsersBloc {
     _listController.sink.add(_list);
   }
 
-  Future<void> newUser(User user, {int delayTime = 0}) {
+  Future<void> editUser(User user, {int delayTime = 0}) {
     Future.delayed(Duration(seconds: delayTime));
     if (user.documentId.isEmpty) {
       return Firestore.instance.collection(_collectionId).add({

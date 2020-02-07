@@ -50,6 +50,13 @@ class MyHomePage extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/userdetail');
+        },
+        tooltip: 'Add User',
+        child: Icon(Icons.add),
+      ),
     );
   }
 }

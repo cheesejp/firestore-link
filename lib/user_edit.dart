@@ -9,21 +9,8 @@ class UserEdit extends StatelessWidget {
 
   UserEdit({this.title});
 
-  User _getUserInfo(context) {
-    var user = ModalRoute.of(context).settings.arguments;
-
-    if (!(user is User)) {
-      throw new Exception(
-          'User以外のオブジェクトがUserDetailの画面遷移引数に渡されています。User型を渡してください。');
-    }
-
-    return user;
-  }
-
   @override
   Widget build(BuildContext context) {
-    User user = _getUserInfo(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(this.title),
@@ -33,9 +20,6 @@ class UserEdit extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             UserForm(),
-            Text(user.documentId),
-            Text(user.lastName),
-            Text(user.name),
           ],
         ),
       ),
@@ -48,68 +32,89 @@ class UserForm extends StatelessWidget {
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
 
-  String requireValidation(value) {
-    if (value.isEmpty) {
-      return '必須です。';
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     FirestoreUsersBloc bloc =
         Provider.of<FirestoreUsersBloc>(context, listen: false);
+    User _user = _getUserInfo(context);
+    _nameController.text = _user.name;
+    _lastNameController.text = _user.lastName;
 
-    return Form(
-      key: _formkey,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            TextFormField(
-              controller: _lastNameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                filled: true,
-                hintText: '苗字を入力してください。',
-                labelText: '苗字',
-              ),
-              validator: requireValidation,
+    return Column(
+      children: <Widget>[
+        Text('ID : ${_user.documentId}'),
+        Form(
+          key: _formkey,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: <Widget>[
+                TextFormField(
+                  controller: _lastNameController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    hintText: '苗字を入力してください。',
+                    labelText: '苗字',
+                  ),
+                  validator: _requireValidation,
+                ),
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    hintText: '名前を入力してください。',
+                    labelText: '名前',
+                  ),
+                  validator: _requireValidation,
+                ),
+                RaisedButton(
+                  child: const Text('send'),
+                  onPressed: () {
+                    if (_formkey.currentState.validate()) {
+                      _user.name = _nameController.text;
+                      _user.lastName = _lastNameController.text;
+                      bloc.editUser(_user).then((onValue) {
+                        print('success!');
+                      }).catchError((onError) {
+                        print('error!');
+                      }).whenComplete(() {
+                        bloc.getUsers();
+                        Navigator.pop(context);
+                        print('done.');
+                      });
+                    }
+                  },
+                ),
+              ],
             ),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                filled: true,
-                hintText: '名前を入力してください。',
-                labelText: '名前',
-              ),
-              validator: requireValidation,
-            ),
-            RaisedButton(
-              child: const Text('send'),
-              onPressed: () {
-                if (_formkey.currentState.validate()) {
-                  bloc
-                      .newUser(User(
-                          name: _nameController.text,
-                          lastName: _lastNameController.text))
-                      .then((onValue) {
-                    print('success!');
-                  }).catchError((onError) {
-                    print('error!');
-                  }).whenComplete(() {
-                    bloc.getUsers();
-                    Navigator.pop(context);
-                    print('done.');
-                  });
-                }
-              },
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
+  }
+
+  User _getUserInfo(context) {
+    User user = ModalRoute.of(context).settings.arguments;
+
+    if (user == null) {
+      user = User();
+    }
+
+    if (!(user is User)) {
+      throw new Exception(
+          'User以外のオブジェクトがUserDetailの画面遷移引数に渡されています。User型を渡してください。');
+    }
+
+    return user;
+  }
+
+  String _requireValidation(value) {
+    if (value.isEmpty) {
+      return '必須です。';
+    }
+    return null;
   }
 
   void dispose() {
