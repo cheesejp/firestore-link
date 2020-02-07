@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firestore_link/firestore_users_bloc.dart';
+import 'package:firestore_link/value_objects/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,20 +10,20 @@ class UserEdit extends StatelessWidget {
 
   UserEdit({this.title});
 
-  DocumentSnapshot _getValue(context) {
-    var arguments = ModalRoute.of(context).settings.arguments;
+  User _getUserInfo(context) {
+    var snapshot = ModalRoute.of(context).settings.arguments;
 
-    if (!(arguments is DocumentSnapshot)) {
+    if (!(snapshot is DocumentSnapshot)) {
       throw new Exception(
           'DocumentSnapshot以外のオブジェクトがUserDetailの画面遷移引数に渡されています。DocumentSnapshot型を渡してください。');
     }
-    print(arguments);
-    return arguments;
+    User userInfo = User.fromDocumentSnapshot(snapshot);
+    return userInfo;
   }
 
   @override
   Widget build(BuildContext context) {
-    DocumentSnapshot document = _getValue(context);
+    User userInfo = _getUserInfo(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -33,9 +34,9 @@ class UserEdit extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             UserForm(),
-            Text(document.documentID),
-            Text(document.data['last_name']),
-            Text(document.data['name']),
+            Text(userInfo.documentId),
+            Text(userInfo.lastName),
+            Text(userInfo.name),
           ],
         ),
       ),
