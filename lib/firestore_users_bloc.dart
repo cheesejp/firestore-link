@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firestore_link/value_objects/user.dart';
 
 class FirestoreUsersBloc {
   static const String _collectionId = "users";
-  final _listController = StreamController<QuerySnapshot>();
-  Stream<QuerySnapshot> get list => _listController.stream;
+  final _listController = StreamController<List<User>>();
+  Stream<List<User>> get listStream => _listController.stream;
 
   FirestoreUsersBloc() {
     getUsers();
@@ -12,26 +13,28 @@ class FirestoreUsersBloc {
 
   void getUsers({int delayTime = 0}) async {
     await Future.delayed(Duration(seconds: delayTime));
-    QuerySnapshot _list =
+    QuerySnapshot _documents =
         await Firestore.instance.collection(_collectionId).getDocuments();
+    List<User> _list = new List<User>();
+    _documents.documents
+        .forEach((v) => _list.add(User.fromDocumentSnapshot(v)));
     _listController.sink.add(_list);
   }
 
-  Future<void> newUser(String lastName, String name,
-      {String documentId = '', int delayTime = 0}) {
+  Future<void> newUser(User user, {int delayTime = 0}) {
     Future.delayed(Duration(seconds: delayTime));
-    if (documentId.isEmpty) {
+    if (user.documentId.isEmpty) {
       return Firestore.instance.collection(_collectionId).add({
-        'name': name,
-        'last_name': lastName,
+        'name': user.name,
+        'last_name': user.lastName,
       });
     } else {
       return Firestore.instance
           .collection(_collectionId)
-          .document(documentId)
+          .document(user.documentId)
           .setData({
-        'name': name,
-        'last_name': lastName,
+        'name': user.name,
+        'last_name': user.lastName,
       });
     }
   }

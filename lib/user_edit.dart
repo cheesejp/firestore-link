@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firestore_link/firestore_users_bloc.dart';
 import 'package:firestore_link/value_objects/user.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,19 +10,19 @@ class UserEdit extends StatelessWidget {
   UserEdit({this.title});
 
   User _getUserInfo(context) {
-    var snapshot = ModalRoute.of(context).settings.arguments;
+    var user = ModalRoute.of(context).settings.arguments;
 
-    if (!(snapshot is DocumentSnapshot)) {
+    if (!(user is User)) {
       throw new Exception(
-          'DocumentSnapshot以外のオブジェクトがUserDetailの画面遷移引数に渡されています。DocumentSnapshot型を渡してください。');
+          'User以外のオブジェクトがUserDetailの画面遷移引数に渡されています。User型を渡してください。');
     }
-    User userInfo = User.fromDocumentSnapshot(snapshot);
-    return userInfo;
+
+    return user;
   }
 
   @override
   Widget build(BuildContext context) {
-    User userInfo = _getUserInfo(context);
+    User user = _getUserInfo(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -34,9 +33,9 @@ class UserEdit extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             UserForm(),
-            Text(userInfo.documentId),
-            Text(userInfo.lastName),
-            Text(userInfo.name),
+            Text(user.documentId),
+            Text(user.lastName),
+            Text(user.name),
           ],
         ),
       ),
@@ -92,7 +91,9 @@ class UserForm extends StatelessWidget {
               onPressed: () {
                 if (_formkey.currentState.validate()) {
                   bloc
-                      .newUser(_lastNameController.text, _nameController.text)
+                      .newUser(User(
+                          name: _nameController.text,
+                          lastName: _lastNameController.text))
                       .then((onValue) {
                     print('success!');
                   }).catchError((onError) {

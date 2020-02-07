@@ -1,5 +1,6 @@
 import 'package:firestore_link/firestore_users_bloc.dart';
 import 'package:firestore_link/user_edit.dart';
+import 'package:firestore_link/value_objects/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
@@ -58,27 +59,24 @@ class _FirestoreUsersStreamList extends StatelessWidget {
     if (snapshot.hasError) {
       return Text('error');
     } else if (snapshot.connectionState == ConnectionState.active) {
-      var documentSnapshots = snapshot.data?.documents ?? [];
+      List<User> userList = snapshot.data ?? [];
       return SizedBox(
         height: 500.0,
         child: ListView.builder(
             padding: EdgeInsets.all(8),
-            itemCount: documentSnapshots.length,
+            itemCount: userList.length,
             itemBuilder: (context, index) => Slidable(
                     actionPane: SlidableDrawerActionPane(),
                     actionExtentRatio: 0.25,
                     child: ListTile(
                       leading: Icon(Icons.tag_faces),
-                      title:
-                          Text('ID : ' + documentSnapshots[index].documentID),
+                      title: Text('ID : ${userList[index].documentId}'),
                       subtitle: Text(
-                          documentSnapshots[index].data['last_name'] +
-                              ' ' +
-                              documentSnapshots[index].data['name']),
+                          '${userList[index].lastName} ${userList[index].name}'),
                       isThreeLine: true,
                       onTap: () {
                         Navigator.pushNamed(context, '/userdetail',
-                            arguments: documentSnapshots[index]);
+                            arguments: userList[index]);
                       },
                     ),
                     actions: <Widget>[
@@ -87,7 +85,7 @@ class _FirestoreUsersStreamList extends StatelessWidget {
                         color: Colors.red,
                         icon: Icons.delete,
                         onTap: () {
-                          bloc.deleteUser(documentSnapshots[index].documentID);
+                          bloc.deleteUser(userList[index].documentId);
                           bloc.getUsers();
                         },
                       ),
@@ -104,7 +102,7 @@ class _FirestoreUsersStreamList extends StatelessWidget {
         Provider.of<FirestoreUsersBloc>(context, listen: false);
 
     return StreamBuilder(
-      stream: firestoreUsersBloc.list,
+      stream: firestoreUsersBloc.listStream,
       builder: (context, snapshot) {
         return buildList(context, snapshot, firestoreUsersBloc);
       },
