@@ -1,5 +1,5 @@
-import 'package:firestore_link/firestore_users_bloc.dart';
 import 'package:firestore_link/value_objects/user.dart';
+import 'package:firestore_link/blocs/firestore_users_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

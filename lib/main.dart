@@ -1,6 +1,7 @@
-import 'package:firestore_link/firestore_users_bloc.dart';
+import 'package:firestore_link/blocs/firestore_users_repository.dart';
 import 'package:firestore_link/user_edit.dart';
 import 'package:firestore_link/value_objects/user.dart';
+import 'package:firestore_link/blocs/firestore_users_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
-      create: (context) => FirestoreUsersBloc(),
+      create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
       dispose: (_, bloc) => bloc.dispose(),
       child: MaterialApp(
         title: 'BLoC Demo',
@@ -92,7 +93,7 @@ class _FirestoreUsersStreamList extends StatelessWidget {
                         color: Colors.red,
                         icon: Icons.delete,
                         onTap: () {
-                          bloc.deleteUser(userList[index].documentId);
+                          bloc.deleteUser(userList[index]);
                           bloc.getUsers();
                         },
                       ),
