@@ -1,6 +1,6 @@
 # firestore_link
 
-A new Flutter project.
+Firestoreとの連携を勉強中
 
 ## Getting Started
 

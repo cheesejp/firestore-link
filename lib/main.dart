@@ -1,193 +1,103 @@
-import 'package:firestore_link/firestoreUsersLogic.dart';
-import 'package:firestore_link/firestoreUsersService.dart';
+import 'package:firestore_link/blocs/firestore_users_repository.dart';
+import 'package:firestore_link/user_edit.dart';
+import 'package:firestore_link/value_objects/user.dart';
+import 'package:firestore_link/blocs/firestore_users_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return Provider(
+      create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
+      dispose: (_, bloc) => bloc.dispose(),
+      child: MaterialApp(
+        title: 'BLoC Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => MyHomePage(
+                title: 'BLoC Demo',
+              ),
+          '/userdetail': (context) => UserEdit(
+                title: 'User Detail Page',
+              ),
+        },
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class MyHomePage extends StatelessWidget {
   final String title;
+  MyHomePage({this.title = ''});
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            UserForm(),
-            // _FirestoreUserName(),
-            // _FirestoreUsersList(),
             _FirestoreUsersStreamList(),
           ],
         ),
       ),
-    );
-  }
-}
-
-class UserForm extends StatelessWidget {
-  final _formkey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-
-  String requireValidation(value) {
-    if (value.isEmpty) {
-      return '必須です。';
-    }
-    return null;
-  }
-
-  void dispose() {
-    _nameController.dispose();
-    _lastNameController.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formkey,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            TextFormField(
-              controller: _lastNameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                filled: true,
-                hintText: '苗字を入力してください。',
-                labelText: '苗字',
-              ),
-              validator: requireValidation,
-            ),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                filled: true,
-                hintText: '名前を入力してください。',
-                labelText: '名前',
-              ),
-              validator: requireValidation,
-            ),
-            RaisedButton(
-              child: const Text('send'),
-              onPressed: () {
-                if (_formkey.currentState.validate()) {
-                  // FirestoreUsersService()
-                  //     .newUser(_lastNameController.text, _nameController.text)
-
-                  FirestoreUsersLogic()
-                      .newUser(_lastNameController.text, _nameController.text)
-                      .then((onValue) {
-                    print('success!');
-                  }).catchError((onError) {
-                    print('error!');
-                  }).whenComplete(() {
-                    FirestoreUsersLogic().getUsers();
-                    print('done.');
-                  });
-                }
-              },
-            ),
-          ],
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/userdetail');
+        },
+        tooltip: 'Add User',
+        child: Icon(Icons.add),
       ),
-    );
-  }
-}
-
-class _FirestoreUserName extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: FirestoreUsersService().getUser('taro', delayTime: 0),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text('error');
-        } else if (snapshot.hasData) {
-          return Text('${snapshot.data['last_name']} ${snapshot.data['name']}');
-        } else {
-          return Text('loading...');
-        }
-      },
-    );
-  }
-}
-
-class _FirestoreUsersList extends StatelessWidget {
-  dynamic rebuildList(context, snapshot) {
-    if (snapshot.hasError) {
-      return Text('error');
-    } else if (snapshot.hasData) {
-      final items = snapshot.data?.documents ?? [];
-      return SizedBox(
-        height: 200.0,
-        child: ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (context, index) => ListTile(
-                  title: Text('User'),
-                  subtitle: Text(items[index].data['last_name'] +
-                      ' ' +
-                      items[index].data['name']),
-                  isThreeLine: true,
-                )),
-      );
-    } else {
-      return Text('loading...');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: FirestoreUsersService().getUsers(delayTime: 0),
-      builder: (context, snapshot) {
-        return rebuildList(context, snapshot);
-      },
     );
   }
 }
 
 class _FirestoreUsersStreamList extends StatelessWidget {
-  dynamic rebuildList(context, snapshot) {
+  dynamic buildList(context, snapshot, FirestoreUsersBloc bloc) {
     if (snapshot.hasError) {
       return Text('error');
-    } else if (snapshot.hasData) {
-      final items = snapshot.data?.documents ?? [];
+    } else if (snapshot.connectionState == ConnectionState.active) {
+      List<User> userList = snapshot.data ?? [];
       return SizedBox(
-        height: 200.0,
+        height: 500.0,
         child: ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (context, index) => ListTile(
-                  title: Text('User'),
-                  subtitle: Text(items[index].data['last_name'] +
-                      ' ' +
-                      items[index].data['name']),
-                  isThreeLine: true,
-                )),
+            padding: EdgeInsets.all(8),
+            itemCount: userList.length,
+            itemBuilder: (context, index) => Slidable(
+                    actionPane: SlidableDrawerActionPane(),
+                    actionExtentRatio: 0.25,
+                    child: ListTile(
+                      leading: Icon(Icons.tag_faces),
+                      title: Text('ID : ${userList[index].documentId}'),
+                      subtitle: Text(
+                          '${userList[index].lastName} ${userList[index].name}'),
+                      isThreeLine: true,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/userdetail',
+                            arguments: userList[index]);
+                      },
+                    ),
+                    actions: <Widget>[
+                      IconSlideAction(
+                        caption: 'Delete',
+                        color: Colors.red,
+                        icon: Icons.delete,
+                        onTap: () {
+                          bloc.deleteUser(userList[index]);
+                          bloc.getUsers();
+                        },
+                      ),
+                    ])),
       );
     } else {
       return Text('loading...');
@@ -196,10 +106,13 @@ class _FirestoreUsersStreamList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FirestoreUsersBloc firestoreUsersBloc =
+        Provider.of<FirestoreUsersBloc>(context, listen: false);
+
     return StreamBuilder(
-      stream: FirestoreUsersLogic().list,
+      stream: firestoreUsersBloc.listStream,
       builder: (context, snapshot) {
-        return rebuildList(context, snapshot);
+        return buildList(context, snapshot, firestoreUsersBloc);
       },
     );
   }

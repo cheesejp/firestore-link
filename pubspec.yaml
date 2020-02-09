@@ -26,6 +26,12 @@ dependencies:
 
   # Firestore用のプラグイン
   cloud_firestore: 0.13.0+1
+  
+  # リストをスライドしたときにボタンを表示する機能のプラグイン
+  flutter_slidable: ^0.5.4
+
+  # BLoCパターン実装のためのproviderプラグイン
+  provider: ^4.0.2
 
 dev_dependencies:
   flutter_test:
