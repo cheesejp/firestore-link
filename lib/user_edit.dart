@@ -19,7 +19,7 @@ class UserEdit extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            UserForm(),
+            _UserForm(),
           ],
         ),
       ),
@@ -27,7 +27,7 @@ class UserEdit extends StatelessWidget {
   }
 }
 
-class UserForm extends StatelessWidget {
+class _UserForm extends StatelessWidget {
   final _formkey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -104,7 +104,7 @@ class UserForm extends StatelessWidget {
 
     if (!(user is User)) {
       throw new Exception(
-          'User以外のオブジェクトがUserDetailの画面遷移引数に渡されています。User型を渡してください。');
+          'User以外のオブジェクトが/usereditの画面遷移引数に渡されています。User型を渡してください。');
     }
 
     return user;
