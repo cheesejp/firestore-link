@@ -1,25 +1,29 @@
-import 'package:firestore_link/value_objects/user.dart';
-import 'package:firestore_link/blocs/firestore_users_bloc.dart';
+import 'package:firestore_link/src/blocs/firestore_users_bloc.dart';
+import 'package:firestore_link/src/resources/models/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class UserEdit extends StatelessWidget {
-  final String title;
-
-  UserEdit({this.title});
-
+class UserEditPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    User user = ModalRoute.of(context).settings.arguments;
+    if (user == null) {
+      user = User();
+    }
+    if (!(user is User)) {
+      throw Exception('User以外のオブジェクトが/usereditの画面遷移引数に渡されています。User型を渡してください。');
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(this.title),
+        title: Text('User Edit Page'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            UserForm(),
+            _UserForm(user),
           ],
         ),
       ),
@@ -27,16 +31,19 @@ class UserEdit extends StatelessWidget {
   }
 }
 
-class UserForm extends StatelessWidget {
+class _UserForm extends StatelessWidget {
   final _formkey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final User _user;
+
+  _UserForm(this._user);
 
   @override
   Widget build(BuildContext context) {
     FirestoreUsersBloc bloc =
         Provider.of<FirestoreUsersBloc>(context, listen: false);
-    User _user = _getUserInfo(context);
+    User _user = this._user;
     _nameController.text = _user.name;
     _lastNameController.text = _user.lastName;
 
@@ -93,21 +100,6 @@ class UserForm extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  User _getUserInfo(context) {
-    User user = ModalRoute.of(context).settings.arguments;
-
-    if (user == null) {
-      user = User();
-    }
-
-    if (!(user is User)) {
-      throw new Exception(
-          'User以外のオブジェクトがUserDetailの画面遷移引数に渡されています。User型を渡してください。');
-    }
-
-    return user;
   }
 
   String _requireValidation(value) {

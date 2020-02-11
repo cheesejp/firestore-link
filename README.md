@@ -2,6 +2,9 @@
 
 Firestoreとの連携を勉強中
 
+## analysis_options.yaml
+https://github.com/dart-lang/pedantic/blob/master/lib/analysis_options.1.8.0.yaml
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
