@@ -1,7 +1,7 @@
+import 'package:firestore_link/src/ui/screens/hoge.dart';
+import 'package:firestore_link/src/ui/screens/huga.dart';
+import 'package:firestore_link/src/ui/screens/user_list.dart';
 import 'package:flutter/material.dart';
-import 'src/ui/screens/hoge.dart';
-import 'src/ui/screens/huga.dart';
-import 'src/ui/screens/user_list.dart';
 
 void main() => runApp(MyApp());
 
@@ -35,6 +35,8 @@ class _AppBottomNavigationState extends State<AppBottomNavigation> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      // Navigator.of(context)
+      //     .pushReplacement(MaterialPageRoute(builder: (context) => HogePage()));
     });
   }
 

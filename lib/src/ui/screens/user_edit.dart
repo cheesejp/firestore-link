@@ -5,21 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class UserEditPage extends StatelessWidget {
-  final String title;
-
-  UserEditPage({this.title});
+  final User _user;
+  UserEditPage(this._user);
+  UserEditPage.newUser() : this(User());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(this.title),
+        title: Text('User Edit Page'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _UserForm(),
+            _UserForm(_user),
           ],
         ),
       ),
@@ -31,12 +31,15 @@ class _UserForm extends StatelessWidget {
   final _formkey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final User _user;
+
+  _UserForm(this._user);
 
   @override
   Widget build(BuildContext context) {
     FirestoreUsersBloc bloc =
         Provider.of<FirestoreUsersBloc>(context, listen: false);
-    User _user = _getUserInfo(context);
+    User _user = this._user;
     _nameController.text = _user.name;
     _lastNameController.text = _user.lastName;
 
@@ -93,20 +96,6 @@ class _UserForm extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  User _getUserInfo(context) {
-    User user = ModalRoute.of(context).settings.arguments;
-
-    if (user == null) {
-      user = User();
-    }
-
-    if (!(user is User)) {
-      throw Exception('User以外のオブジェクトが/usereditの画面遷移引数に渡されています。User型を渡してください。');
-    }
-
-    return user;
   }
 
   String _requireValidation(value) {

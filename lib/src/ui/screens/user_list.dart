@@ -1,21 +1,48 @@
 import 'package:firestore_link/src/blocs/firestore_users_bloc.dart';
 import 'package:firestore_link/src/resources/models/user.dart';
 import 'package:firestore_link/src/resources/repositories/firestore_users_repository.dart';
+import 'package:firestore_link/src/ui/screens/user_edit.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+// class UserParent extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Navigator(
+//         initialRoute: '/',
+//         onGenerateRoute: (RouteSettings settings) {
+//           WidgetBuilder builder;
+//           // Manage your route names here
+//           switch (settings.name) {
+//             case '/':
+//               builder = (BuildContext context) => HomePage();
+//               break;
+//             case '/edit':
+//               builder = (BuildContext context) => Page1();
+//               break;
+//             default:
+//               throw Exception('Invalid route: ${settings.name}');
+//           }
+//           // You can also return a PageRouteBuilder and
+//           // define custom transitions between pages
+//           return MaterialPageRoute(
+//             builder: builder,
+//             settings: settings,
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
 
 class UserListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
       create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
-      // dispose: (_, bloc) => bloc.dispose(),
-      dispose: (_, bloc) {
-        print('Provider dispose.');
-        bloc.dispose();
-      },
-
+      dispose: (_, bloc) => bloc.dispose(),
       child: Scaffold(
         appBar: AppBar(
           title: Text('User List Page'),
@@ -23,6 +50,10 @@ class UserListPage extends StatelessWidget {
         body: _FirestoreUsersStreamList(),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => UserEditPage.newUser()));
             // Navigator.pushNamed(context, '/useredit');
           },
           tooltip: 'Add User',
@@ -54,6 +85,11 @@ class _FirestoreUsersStreamList extends StatelessWidget {
                           '${userList[index].lastName} ${userList[index].name}'),
                       isThreeLine: true,
                       onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    UserEditPage(userList[index])));
                         // Navigator.pushNamed(context, '/useredit',
                         //     arguments: userList[index]);
                       },
