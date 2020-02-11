@@ -27,7 +27,7 @@ class _AppBottomNavigationState extends State<AppBottomNavigation> {
   int _selectedIndex = 0;
 
   final List<Widget> _children = [
-    UserListPage(),
+    UserParent(),
     HogePage(),
     HugaPage(),
   ];
@@ -35,8 +35,6 @@ class _AppBottomNavigationState extends State<AppBottomNavigation> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // Navigator.of(context)
-      //     .pushReplacement(MaterialPageRoute(builder: (context) => HogePage()));
     });
   }
 

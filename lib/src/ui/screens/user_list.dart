@@ -6,59 +6,51 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// class UserParent extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Navigator(
-//         initialRoute: '/',
-//         onGenerateRoute: (RouteSettings settings) {
-//           WidgetBuilder builder;
-//           // Manage your route names here
-//           switch (settings.name) {
-//             case '/':
-//               builder = (BuildContext context) => HomePage();
-//               break;
-//             case '/edit':
-//               builder = (BuildContext context) => Page1();
-//               break;
-//             default:
-//               throw Exception('Invalid route: ${settings.name}');
-//           }
-//           // You can also return a PageRouteBuilder and
-//           // define custom transitions between pages
-//           return MaterialPageRoute(
-//             builder: builder,
-//             settings: settings,
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-
-class UserListPage extends StatelessWidget {
+class UserParent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
       create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
       dispose: (_, bloc) => bloc.dispose(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('User List Page'),
-        ),
-        body: _FirestoreUsersStreamList(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => UserEditPage.newUser()));
-            // Navigator.pushNamed(context, '/useredit');
-          },
-          tooltip: 'Add User',
-          child: Icon(Icons.add),
-        ),
+      child: Navigator(
+        initialRoute: '/',
+        onGenerateRoute: (RouteSettings settings) {
+          // TODO onGenerateRoute()が2回呼ばれる。1回目はsettings.name = '/'で呼ばれ、2回目はinitialRouteで設定された文字列がsettings.nameに代入されて呼び出される。詳細は不明なので調査すること。
+          WidgetBuilder builder;
+          switch (settings.name) {
+            case '/':
+              builder = (BuildContext context) => UserListPage();
+              break;
+            case '/useredit':
+              builder = (BuildContext context) => UserEditPage();
+              break;
+            default:
+              builder = (BuildContext context) => UserListPage();
+          }
+          return MaterialPageRoute(
+            builder: builder,
+            settings: settings,
+          );
+        },
+      ),
+    );
+  }
+}
+
+class UserListPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('User List Page'),
+      ),
+      body: _FirestoreUsersStreamList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/useredit');
+        },
+        tooltip: 'Add User',
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -85,13 +77,8 @@ class _FirestoreUsersStreamList extends StatelessWidget {
                           '${userList[index].lastName} ${userList[index].name}'),
                       isThreeLine: true,
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    UserEditPage(userList[index])));
-                        // Navigator.pushNamed(context, '/useredit',
-                        //     arguments: userList[index]);
+                        Navigator.pushNamed(context, '/useredit',
+                            arguments: userList[index]);
                       },
                     ),
                     actions: <Widget>[

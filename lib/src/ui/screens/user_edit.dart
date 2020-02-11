@@ -5,12 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class UserEditPage extends StatelessWidget {
-  final User _user;
-  UserEditPage(this._user);
-  UserEditPage.newUser() : this(User());
-
   @override
   Widget build(BuildContext context) {
+    User user = ModalRoute.of(context).settings.arguments;
+    if (user == null) {
+      user = User();
+    }
+    if (!(user is User)) {
+      throw Exception('User以外のオブジェクトが/usereditの画面遷移引数に渡されています。User型を渡してください。');
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('User Edit Page'),
@@ -19,7 +23,7 @@ class UserEditPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _UserForm(_user),
+            _UserForm(user),
           ],
         ),
       ),
