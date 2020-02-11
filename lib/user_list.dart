@@ -1,36 +1,24 @@
 import 'package:firestore_link/blocs/firestore_users_bloc.dart';
-import 'package:firestore_link/common/bottom_navigation_bar.dart';
 import 'package:firestore_link/value_objects/user.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class UserList extends StatelessWidget {
-  final String title;
-  UserList({this.title = ''});
-
+class UserListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text('User List Page'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _FirestoreUsersStreamList(),
-          ],
-        ),
-      ),
+      body: _FirestoreUsersStreamList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/useredit');
+          // Navigator.pushNamed(context, '/useredit');
         },
         tooltip: 'Add User',
         child: Icon(Icons.add),
       ),
-      bottomNavigationBar: AppBottomNavigation(),
     );
   }
 }
@@ -56,8 +44,8 @@ class _FirestoreUsersStreamList extends StatelessWidget {
                           '${userList[index].lastName} ${userList[index].name}'),
                       isThreeLine: true,
                       onTap: () {
-                        Navigator.pushNamed(context, '/useredit',
-                            arguments: userList[index]);
+                        // Navigator.pushNamed(context, '/useredit',
+                        //     arguments: userList[index]);
                       },
                     ),
                     actions: <Widget>[

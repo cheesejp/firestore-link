@@ -4,10 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class UserEdit extends StatelessWidget {
+class UserEditPage extends StatelessWidget {
   final String title;
 
-  UserEdit({this.title});
+  UserEditPage({this.title});
 
   @override
   Widget build(BuildContext context) {

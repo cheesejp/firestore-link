@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firestore_link/blocs/users_repository.dart';
 import 'package:firestore_link/value_objects/user.dart';
