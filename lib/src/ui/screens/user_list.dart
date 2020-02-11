@@ -5,6 +5,8 @@ import 'package:firestore_link/src/ui/screens/user_edit.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firestore_link/src/ui/routes/route_constants.dart'
+    as route_constants;
 
 class UserParent extends StatelessWidget {
   @override
@@ -13,15 +15,11 @@ class UserParent extends StatelessWidget {
       create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
       dispose: (_, bloc) => bloc.dispose(),
       child: Navigator(
-        initialRoute: '/',
         onGenerateRoute: (RouteSettings settings) {
           // TODO onGenerateRoute()が2回呼ばれる。1回目はsettings.name = '/'で呼ばれ、2回目はinitialRouteで設定された文字列がsettings.nameに代入されて呼び出される。詳細は不明なので調査すること。
           WidgetBuilder builder;
           switch (settings.name) {
-            case '/':
-              builder = (BuildContext context) => UserListPage();
-              break;
-            case '/useredit':
+            case route_constants.UserEditPageRoute:
               builder = (BuildContext context) => UserEditPage();
               break;
             default:
@@ -47,7 +45,7 @@ class UserListPage extends StatelessWidget {
       body: _FirestoreUsersStreamList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/useredit');
+          Navigator.pushNamed(context, route_constants.UserEditPageRoute);
         },
         tooltip: 'Add User',
         child: Icon(Icons.add),
@@ -77,7 +75,8 @@ class _FirestoreUsersStreamList extends StatelessWidget {
                           '${userList[index].lastName} ${userList[index].name}'),
                       isThreeLine: true,
                       onTap: () {
-                        Navigator.pushNamed(context, '/useredit',
+                        Navigator.pushNamed(
+                            context, route_constants.UserEditPageRoute,
                             arguments: userList[index]);
                       },
                     ),
