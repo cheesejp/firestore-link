@@ -1,4 +1,4 @@
-import 'package:firestore_link/value_objects/user.dart';
+import 'package:firestore_link/src/resources/models/user.dart';
 
 abstract class UsersRepository {
   Future<List<User>> getUsers();

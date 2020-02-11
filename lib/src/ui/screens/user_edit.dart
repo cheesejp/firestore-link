@@ -1,5 +1,5 @@
-import 'package:firestore_link/value_objects/user.dart';
-import 'package:firestore_link/blocs/firestore_users_bloc.dart';
+import 'package:firestore_link/src/blocs/firestore_users_bloc.dart';
+import 'package:firestore_link/src/resources/models/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -103,8 +103,7 @@ class _UserForm extends StatelessWidget {
     }
 
     if (!(user is User)) {
-      throw new Exception(
-          'User以外のオブジェクトが/usereditの画面遷移引数に渡されています。User型を渡してください。');
+      throw Exception('User以外のオブジェクトが/usereditの画面遷移引数に渡されています。User型を渡してください。');
     }
 
     return user;

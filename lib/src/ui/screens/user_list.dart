@@ -1,5 +1,6 @@
-import 'package:firestore_link/blocs/firestore_users_bloc.dart';
-import 'package:firestore_link/value_objects/user.dart';
+import 'package:firestore_link/src/blocs/firestore_users_bloc.dart';
+import 'package:firestore_link/src/resources/models/user.dart';
+import 'package:firestore_link/src/resources/repositories/firestore_users_repository.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,17 +8,26 @@ import 'package:provider/provider.dart';
 class UserListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('User List Page'),
-      ),
-      body: _FirestoreUsersStreamList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigator.pushNamed(context, '/useredit');
-        },
-        tooltip: 'Add User',
-        child: Icon(Icons.add),
+    return Provider(
+      create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
+      // dispose: (_, bloc) => bloc.dispose(),
+      dispose: (_, bloc) {
+        print('Provider dispose.');
+        bloc.dispose();
+      },
+
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('User List Page'),
+        ),
+        body: _FirestoreUsersStreamList(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Navigator.pushNamed(context, '/useredit');
+          },
+          tooltip: 'Add User',
+          child: Icon(Icons.add),
+        ),
       ),
     );
   }

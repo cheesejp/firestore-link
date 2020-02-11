@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'package:firestore_link/blocs/firestore_users_repository.dart';
-import 'package:firestore_link/value_objects/user.dart';
+
+import 'package:firestore_link/src/resources/models/user.dart';
+import 'package:firestore_link/src/resources/repositories/firestore_users_repository.dart';
 
 class FirestoreUsersBloc {
   final FirestoreUsersRepository _firestoreUsersRepository;

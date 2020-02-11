@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firestore_link/blocs/users_repository.dart';
-import 'package:firestore_link/value_objects/user.dart';
+import 'package:firestore_link/src/resources/models/user.dart';
+
+import 'users_repository.dart';
 
 class FirestoreUsersRepository extends UsersRepository {
   static const String _collectionId = "users";
@@ -9,14 +10,14 @@ class FirestoreUsersRepository extends UsersRepository {
     await Future.delayed(Duration(seconds: delayTime));
     QuerySnapshot _documents =
         await Firestore.instance.collection(_collectionId).getDocuments();
-    List<User> _list = new List<User>();
+    List<User> _list = List<User>();
     _documents.documents
         .forEach((v) => _list.add(User.fromDocumentSnapshot(v)));
     return _list;
   }
 
   Future<void> editUser(User user, {int delayTime = 0}) async {
-    Future.delayed(Duration(seconds: delayTime));
+    await Future.delayed(Duration(seconds: delayTime));
     if (user.documentId.isEmpty) {
       return Firestore.instance.collection(_collectionId).add({
         'name': user.name,
@@ -33,7 +34,7 @@ class FirestoreUsersRepository extends UsersRepository {
     }
   }
 
-  void deleteUserById(String documentId, {int delayTime = 0}) async {
+  Future<void> deleteUserById(String documentId, {int delayTime = 0}) async {
     await Future.delayed(Duration(seconds: delayTime));
     return await Firestore.instance
         .collection(_collectionId)

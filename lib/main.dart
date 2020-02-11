@@ -1,23 +1,64 @@
-import 'package:firestore_link/blocs/firestore_users_repository.dart';
-import 'package:firestore_link/common/bottom_navigation_bar.dart';
-import 'package:firestore_link/blocs/firestore_users_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'src/ui/screens/hoge.dart';
+import 'src/ui/screens/huga.dart';
+import 'src/ui/screens/user_list.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Provider(
-      create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
-      dispose: (_, bloc) => bloc.dispose(),
-      child: MaterialApp(
-        title: 'BLoC Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: AppBottomNavigation(),
+    return MaterialApp(
+      title: 'BLoC Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: AppBottomNavigation(),
+    );
+  }
+}
+
+class AppBottomNavigation extends StatefulWidget {
+  @override
+  _AppBottomNavigationState createState() => _AppBottomNavigationState();
+}
+
+class _AppBottomNavigationState extends State<AppBottomNavigation> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _children = [
+    UserListPage(),
+    HogePage(),
+    HugaPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _children[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            title: Text('User List'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.pets),
+            title: Text('Hoge'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            title: Text('Huga'),
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
     );
   }
