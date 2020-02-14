@@ -13,20 +13,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: AppBottomNavigation(),
+      home: AppNavigation(),
     );
   }
 }
 
-class AppBottomNavigation extends StatefulWidget {
+class AppNavigation extends StatefulWidget {
   @override
-  _AppBottomNavigationState createState() => _AppBottomNavigationState();
+  _AppNavigationState createState() => _AppNavigationState();
 }
 
-class _AppBottomNavigationState extends State<AppBottomNavigation> {
+class _AppNavigationState extends State<AppNavigation> {
   int _selectedIndex = 0;
 
-  final List<Widget> _children = [
+  final List<Widget> _pages = [
     UserParent(),
     HogePage(),
     HugaPage(),
@@ -40,7 +40,7 @@ class _AppBottomNavigationState extends State<AppBottomNavigation> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _children[_selectedIndex],
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
