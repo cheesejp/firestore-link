@@ -6,25 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:firestore_link/src/ui/routes/router.dart' as router;
 
 class UserListPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('User List Page'),
-      ),
-      body: _FirestoreUsersStreamList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, router.USER_EDIT_PAGE_ROUTE);
-        },
-        tooltip: 'Add User',
-        child: Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-class _FirestoreUsersStreamList extends StatelessWidget {
   dynamic buildList(context, snapshot, FirestoreUsersBloc bloc) {
     bloc.getUsers();
     if (snapshot.hasError) {

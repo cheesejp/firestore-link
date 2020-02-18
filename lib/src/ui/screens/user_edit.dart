@@ -7,10 +7,6 @@ import 'package:provider/provider.dart';
 class UserEditPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // User user = ModalRoute.of(context).settings.arguments;
-    print(ModalRoute.of(context));
-    print(ModalRoute.of(context).settings);
-
     User user = ModalRoute.of(context).settings.arguments;
 
     if (user == null) {
@@ -20,17 +16,12 @@ class UserEditPage extends StatelessWidget {
       throw Exception('User以外のオブジェクトが/usereditの画面遷移引数に渡されています。User型を渡してください。');
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('User Edit Page'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _UserForm(user),
-          ],
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          _UserForm(user),
+        ],
       ),
     );
   }
