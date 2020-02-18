@@ -1,3 +1,4 @@
+import 'package:firestore_link/src/ui/routes/route_constants.dart';
 import 'package:firestore_link/src/ui/screens/hoge.dart';
 import 'package:firestore_link/src/ui/screens/huga.dart';
 import 'package:firestore_link/src/ui/screens/user_list.dart';
@@ -25,23 +26,47 @@ class AppNavigation extends StatefulWidget {
 
 class _AppNavigationState extends State<AppNavigation> {
   int _selectedIndex = 0;
+  final _navigatorKey = GlobalKey<NavigatorState>();
 
-  final List<Widget> _pages = [
-    UserParent(),
-    HogePage(),
-    HugaPage(),
+  final List<String> _pageRoutes = [
+    UserListPageRoute,
+    HogePageRoute,
+    HugaPageRoute,
   ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
+      body: _navigator(),
+      bottomNavigationBar: _bottomNavigationBar(),
+    );
+  }
+
+  Navigator _navigator() => Navigator(
+        key: _navigatorKey,
+        initialRoute: '/',
+        onGenerateRoute: (RouteSettings settings) {
+          WidgetBuilder builder;
+          switch (settings.name) {
+            case UserListPageRoute:
+              builder = (BuildContext context) => UserParent();
+              break;
+            case HogePageRoute:
+              builder = (BuildContext context) => HogePage();
+              break;
+            case HugaPageRoute:
+              builder = (BuildContext context) => HugaPage();
+              break;
+            default:
+              throw Exception('Invalid route: ${settings.name}');
+          }
+          return MaterialPageRoute(
+            builder: builder,
+            settings: settings,
+          );
+        },
+      );
+
+  BottomNavigationBar _bottomNavigationBar() => BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -59,7 +84,12 @@ class _AppNavigationState extends State<AppNavigation> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
         onTap: _onItemTapped,
-      ),
-    );
+      );
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _navigatorKey.currentState.pushReplacementNamed(_pageRoutes[index]);
+      _selectedIndex = index;
+    });
   }
 }
