@@ -1,8 +1,9 @@
-import 'package:firestore_link/src/ui/routes/route_constants.dart';
-import 'package:firestore_link/src/ui/screens/hoge.dart';
-import 'package:firestore_link/src/ui/screens/huga.dart';
-import 'package:firestore_link/src/ui/screens/user_list.dart';
+import 'package:firestore_link/src/blocs/firestore_users_bloc.dart';
+import 'package:firestore_link/src/resources/repositories/firestore_users_repository.dart';
+import 'package:firestore_link/src/ui/routes/router.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:firestore_link/src/ui/routes/router.dart' as router;
 
 void main() => runApp(MyApp());
 
@@ -29,41 +30,26 @@ class _AppNavigationState extends State<AppNavigation> {
   final _navigatorKey = GlobalKey<NavigatorState>();
 
   final List<String> _pageRoutes = [
-    UserListPageRoute,
-    HogePageRoute,
-    HugaPageRoute,
+    USER_LIST_PAGE_ROUTE,
+    HOGE_PAGE_ROUTE,
+    HUGA_PAGE_ROUTE,
   ];
 
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _navigator(),
+      body: Provider(
+        create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
+        dispose: (_, bloc) => bloc.dispose(),
+        child: _navigator(),
+      ),
       bottomNavigationBar: _bottomNavigationBar(),
     );
   }
 
   Navigator _navigator() => Navigator(
         key: _navigatorKey,
-        initialRoute: '/',
-        onGenerateRoute: (RouteSettings settings) {
-          WidgetBuilder builder;
-          switch (settings.name) {
-            case UserListPageRoute:
-              builder = (BuildContext context) => UserParent();
-              break;
-            case HogePageRoute:
-              builder = (BuildContext context) => HogePage();
-              break;
-            case HugaPageRoute:
-              builder = (BuildContext context) => HugaPage();
-              break;
-            default:
-              throw Exception('Invalid route: ${settings.name}');
-          }
-          return MaterialPageRoute(
-            builder: builder,
-            settings: settings,
-          );
-        },
+        initialRoute: USER_LIST_PAGE_ROUTE,
+        onGenerateRoute: (settings) => router.generateRoute(settings),
       );
 
   BottomNavigationBar _bottomNavigationBar() => BottomNavigationBar(
@@ -92,4 +78,13 @@ class _AppNavigationState extends State<AppNavigation> {
       _selectedIndex = index;
     });
   }
+
+// TabController(vsync: tickerProvider, length: tabCount)..addListener(() {
+//   if (!tabController.indexIsChanging) {
+//     setState(() {
+//       // Rebuild the enclosing scaffold with a new AppBar title
+//       appBarTitle = 'Tab ${tabController.index}';
+//     });
+//   }
+// })
 }

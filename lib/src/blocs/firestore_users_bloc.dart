@@ -5,14 +5,10 @@ import 'package:firestore_link/src/resources/repositories/firestore_users_reposi
 
 class FirestoreUsersBloc {
   final FirestoreUsersRepository _firestoreUsersRepository;
-  final _listController = StreamController<List<User>>();
+  final _listController = StreamController<List<User>>.broadcast();
   Stream<List<User>> get listStream => _listController.stream;
 
-  FirestoreUsersBloc(this._firestoreUsersRepository) {
-    _firestoreUsersRepository.getUsers().then((list) {
-      _listController.sink.add(list);
-    });
-  }
+  FirestoreUsersBloc(this._firestoreUsersRepository);
 
   void getUsers({int delayTime = 0}) async {
     List<User> list =
