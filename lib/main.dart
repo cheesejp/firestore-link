@@ -78,13 +78,4 @@ class _AppNavigationState extends State<AppNavigation> {
       _selectedIndex = index;
     });
   }
-
-// TabController(vsync: tickerProvider, length: tabCount)..addListener(() {
-//   if (!tabController.indexIsChanging) {
-//     setState(() {
-//       // Rebuild the enclosing scaffold with a new AppBar title
-//       appBarTitle = 'Tab ${tabController.index}';
-//     });
-//   }
-// })
 }

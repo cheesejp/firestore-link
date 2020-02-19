@@ -7,10 +7,6 @@ import 'package:provider/provider.dart';
 class UserEditPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // User user = ModalRoute.of(context).settings.arguments;
-    print(ModalRoute.of(context));
-    print(ModalRoute.of(context).settings);
-
     User user = ModalRoute.of(context).settings.arguments;
 
     if (user == null) {
