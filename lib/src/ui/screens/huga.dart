@@ -6,6 +6,11 @@ class HugaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text('This is Huga Page.');
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Huga Page'),
+      ),
+      body: Text('This is Huga Page.'),
+    );
   }
 }

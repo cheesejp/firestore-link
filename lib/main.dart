@@ -37,22 +37,12 @@ class _AppNavigationState extends State<AppNavigation> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Title'),
-      ),
       body: Provider(
         create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
         dispose: (_, bloc) => bloc.dispose(),
         child: _navigator(),
       ),
       bottomNavigationBar: _bottomNavigationBar(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _navigatorKey.currentState.pushNamed(router.USER_EDIT_PAGE_ROUTE);
-        },
-        tooltip: 'Add User',
-        child: Icon(Icons.add),
-      ),
     );
   }
 
