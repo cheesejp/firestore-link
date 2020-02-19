@@ -1,39 +1,9 @@
 import 'package:firestore_link/src/blocs/firestore_users_bloc.dart';
 import 'package:firestore_link/src/resources/models/user.dart';
-import 'package:firestore_link/src/resources/repositories/firestore_users_repository.dart';
-import 'package:firestore_link/src/ui/screens/user_edit.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firestore_link/src/ui/routes/route_constants.dart'
-    as route_constants;
-
-class UserParent extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Provider(
-      create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
-      dispose: (_, bloc) => bloc.dispose(),
-      child: Navigator(
-        onGenerateRoute: (RouteSettings settings) {
-          // TODO onGenerateRoute()が2回呼ばれる。1回目はsettings.name = '/'で呼ばれ、2回目はinitialRouteで設定された文字列がsettings.nameに代入されて呼び出される。詳細は不明なので調査すること。
-          WidgetBuilder builder;
-          switch (settings.name) {
-            case route_constants.UserEditPageRoute:
-              builder = (BuildContext context) => UserEditPage();
-              break;
-            default:
-              builder = (BuildContext context) => UserListPage();
-          }
-          return MaterialPageRoute(
-            builder: builder,
-            settings: settings,
-          );
-        },
-      ),
-    );
-  }
-}
+import 'package:firestore_link/src/ui/routes/router.dart' as router;
 
 class UserListPage extends StatelessWidget {
   @override
@@ -45,7 +15,7 @@ class UserListPage extends StatelessWidget {
       body: _FirestoreUsersStreamList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, route_constants.UserEditPageRoute);
+          Navigator.pushNamed(context, router.USER_EDIT_PAGE_ROUTE);
         },
         tooltip: 'Add User',
         child: Icon(Icons.add),
@@ -56,6 +26,7 @@ class UserListPage extends StatelessWidget {
 
 class _FirestoreUsersStreamList extends StatelessWidget {
   dynamic buildList(context, snapshot, FirestoreUsersBloc bloc) {
+    bloc.getUsers();
     if (snapshot.hasError) {
       return Text('error');
     } else if (snapshot.connectionState == ConnectionState.active) {
@@ -76,7 +47,7 @@ class _FirestoreUsersStreamList extends StatelessWidget {
                       isThreeLine: true,
                       onTap: () {
                         Navigator.pushNamed(
-                            context, route_constants.UserEditPageRoute,
+                            context, router.USER_EDIT_PAGE_ROUTE,
                             arguments: userList[index]);
                       },
                     ),

@@ -1,7 +1,9 @@
-import 'package:firestore_link/src/ui/screens/hoge.dart';
-import 'package:firestore_link/src/ui/screens/huga.dart';
-import 'package:firestore_link/src/ui/screens/user_list.dart';
+import 'package:firestore_link/src/blocs/firestore_users_bloc.dart';
+import 'package:firestore_link/src/resources/repositories/firestore_users_repository.dart';
+import 'package:firestore_link/src/ui/routes/router.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:firestore_link/src/ui/routes/router.dart' as router;
 
 void main() => runApp(MyApp());
 
@@ -25,23 +27,32 @@ class AppNavigation extends StatefulWidget {
 
 class _AppNavigationState extends State<AppNavigation> {
   int _selectedIndex = 0;
+  final _navigatorKey = GlobalKey<NavigatorState>();
 
-  final List<Widget> _pages = [
-    UserParent(),
-    HogePage(),
-    HugaPage(),
+  final List<String> _pageRoutes = [
+    USER_LIST_PAGE_ROUTE,
+    HOGE_PAGE_ROUTE,
+    HUGA_PAGE_ROUTE,
   ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
+      body: Provider(
+        create: (context) => FirestoreUsersBloc(FirestoreUsersRepository()),
+        dispose: (_, bloc) => bloc.dispose(),
+        child: _navigator(),
+      ),
+      bottomNavigationBar: _bottomNavigationBar(),
+    );
+  }
+
+  Navigator _navigator() => Navigator(
+        key: _navigatorKey,
+        initialRoute: USER_LIST_PAGE_ROUTE,
+        onGenerateRoute: (settings) => router.generateRoute(settings),
+      );
+
+  BottomNavigationBar _bottomNavigationBar() => BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -59,7 +70,12 @@ class _AppNavigationState extends State<AppNavigation> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
         onTap: _onItemTapped,
-      ),
-    );
+      );
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _navigatorKey.currentState.pushReplacementNamed(_pageRoutes[index]);
+      _selectedIndex = index;
+    });
   }
 }

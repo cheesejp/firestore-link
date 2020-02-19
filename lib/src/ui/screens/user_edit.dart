@@ -8,6 +8,7 @@ class UserEditPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     User user = ModalRoute.of(context).settings.arguments;
+
     if (user == null) {
       user = User();
     }
