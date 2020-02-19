@@ -15,7 +15,7 @@ class UserListPage extends StatelessWidget {
       body: _FirestoreUsersStreamList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, router.USER_EDIT_PAGE_ROUTE);
+          Navigator.pushNamed(context, router.USER_EDIT_PAGE);
         },
         tooltip: 'Add User',
         child: Icon(Icons.add),
@@ -46,8 +46,7 @@ class _FirestoreUsersStreamList extends StatelessWidget {
                           '${userList[index].lastName} ${userList[index].name}'),
                       isThreeLine: true,
                       onTap: () {
-                        Navigator.pushNamed(
-                            context, router.USER_EDIT_PAGE_ROUTE,
+                        Navigator.pushNamed(context, router.USER_EDIT_PAGE,
                             arguments: userList[index]);
                       },
                     ),
