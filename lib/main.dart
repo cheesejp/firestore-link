@@ -14,9 +14,6 @@ class MyApp extends StatelessWidget {
       dispose: (_, bloc) => bloc.dispose(),
       child: MaterialApp(
         title: 'BLoC Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
         home: HomePage(),
       ),
     );
@@ -44,8 +41,10 @@ List<Destination> destinations = <Destination>[
 ];
 
 class DestinationView extends StatefulWidget {
-  const DestinationView({Key key, this.destination}) : super(key: key);
+  const DestinationView({Key key, this.destination, this.onNavigation})
+      : super(key: key);
   final Destination destination;
+  final VoidCallback onNavigation;
 
   @override
   State<StatefulWidget> createState() => _DestinationViewState();
@@ -55,8 +54,28 @@ class _DestinationViewState extends State<DestinationView> {
   @override
   Widget build(BuildContext context) {
     return Navigator(
+      observers: <NavigatorObserver>[
+        DestinationViewNavigatorObserver(widget.onNavigation),
+      ],
       onGenerateRoute: widget.destination.generateRoute,
     );
+  }
+}
+
+class DestinationViewNavigatorObserver extends NavigatorObserver {
+  DestinationViewNavigatorObserver(this.onNavigation);
+  VoidCallback onNavigation;
+
+  @override
+  void didPop(Route route, Route previousRoute) {
+    super.didPop(route, previousRoute);
+    onNavigation();
+  }
+
+  @override
+  void didPush(Route route, Route previousRoute) {
+    super.didPush(route, previousRoute);
+    onNavigation();
   }
 }
 
@@ -67,10 +86,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int _selectedIndex = 0;
+  List<AnimationController> _viewOpacities;
 
   @override
   void initState() {
     super.initState();
+    _viewOpacities = destinations
+        .map<AnimationController>((dest) => AnimationController(
+            vsync: this, duration: Duration(milliseconds: 200)))
+        .toList();
   }
 
   @override
@@ -87,10 +111,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Stack _destinationViewStack() => Stack(
         children: destinations.map((Destination dest) {
-          DestinationView view = DestinationView(destination: dest);
+          final Widget view = FadeTransition(
+            opacity: _viewOpacities[dest.index],
+            child: DestinationView(
+              destination: dest,
+              onNavigation: () {},
+            ),
+          );
           if (dest.index == _selectedIndex) {
+            _viewOpacities[dest.index].forward();
             return view;
           }
+          _viewOpacities[dest.index].reverse();
           return Offstage(child: view);
         }).toList(),
       );
