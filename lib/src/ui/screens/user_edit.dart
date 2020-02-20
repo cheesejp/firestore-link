@@ -4,18 +4,57 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class UserEditPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    User user = ModalRoute.of(context).settings.arguments;
+class FormComponents {
+  FormComponents(this.labelText, this.hintText, this.vallidator,
+      this.textEditingController);
+  final String hintText;
+  final String labelText;
+  final Function(String) vallidator;
+  final TextEditingController textEditingController;
+}
 
+class UserEditPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _UserEditPageState();
+}
+
+class _UserEditPageState extends State<UserEditPage> {
+  User _user;
+  final _formkey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    User user = ModalRoute.of(context).settings.arguments;
     if (user == null) {
       user = User();
     }
     if (!(user is User)) {
       throw Exception('User以外のオブジェクトが/usereditの画面遷移引数に渡されています。User型を渡してください。');
     }
+    this._user = user;
+    _nameController.text = this._user.name;
+    _lastNameController.text = this._user.lastName;
+  }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _nameController.dispose();
+    _lastNameController.dispose();
+  }
+
+  static String _requireValidation(String value) {
+    if (value.isEmpty) {
+      return '必須です。';
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('User Edit Page'),
@@ -23,95 +62,65 @@ class UserEditPage extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _UserForm(user),
-          ],
+          children: _userForm(),
         ),
       ),
     );
   }
-}
 
-class _UserForm extends StatelessWidget {
-  final _formkey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final User _user;
-
-  _UserForm(this._user);
-
-  @override
-  Widget build(BuildContext context) {
+  List<Widget> _userForm() {
     FirestoreUsersBloc bloc =
         Provider.of<FirestoreUsersBloc>(context, listen: false);
-    User _user = this._user;
-    _nameController.text = _user.name;
-    _lastNameController.text = _user.lastName;
+    List<FormComponents> _formComponents = [
+      FormComponents(
+          '苗字', '苗字を入力してください。', _requireValidation, _lastNameController),
+      FormComponents('名前', '名前を入力してください。', _requireValidation, _nameController),
+    ];
 
-    return Column(
-      children: <Widget>[
-        Text('ID : ${_user.documentId}'),
-        Form(
-          key: _formkey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: <Widget>[
-                TextFormField(
-                  controller: _lastNameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    hintText: '苗字を入力してください。',
-                    labelText: '苗字',
-                  ),
-                  validator: _requireValidation,
-                ),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    hintText: '名前を入力してください。',
-                    labelText: '名前',
-                  ),
-                  validator: _requireValidation,
-                ),
-                RaisedButton(
-                  child: const Text('send'),
-                  onPressed: () {
-                    if (_formkey.currentState.validate()) {
-                      _user.name = _nameController.text;
-                      _user.lastName = _lastNameController.text;
-                      bloc.editUser(_user).then((onValue) {
-                        print('success!');
-                      }).catchError((onError) {
-                        print('error!');
-                      }).whenComplete(() {
-                        bloc.getUsers();
-                        Navigator.pop(context);
-                        print('done.');
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
+    List<TextFormField> forms = _formComponents.map((FormComponents form) {
+      return TextFormField(
+        controller: form.textEditingController,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          filled: true,
+          hintText: form.hintText,
+          labelText: form.labelText,
+        ),
+        validator: form.vallidator,
+      );
+    }).toList();
+
+    return <Widget>[
+      Text('ID : ${this._user.documentId}'),
+      Form(
+        key: _formkey,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: <Widget>[
+              ...forms,
+              RaisedButton(
+                child: const Text('send'),
+                onPressed: () {
+                  if (_formkey.currentState.validate()) {
+                    this._user.name = _nameController.text;
+                    this._user.lastName = _lastNameController.text;
+                    bloc.editUser(this._user).then((onValue) {
+                      print('success!');
+                    }).catchError((onError) {
+                      print('error!');
+                    }).whenComplete(() {
+                      bloc.getUsers();
+                      Navigator.pop(context);
+                      print('done.');
+                    });
+                  }
+                },
+              ),
+            ],
           ),
         ),
-      ],
-    );
-  }
-
-  String _requireValidation(value) {
-    if (value.isEmpty) {
-      return '必須です。';
-    }
-    return null;
-  }
-
-  void dispose() {
-    _nameController.dispose();
-    _lastNameController.dispose();
+      ),
+    ];
   }
 }
