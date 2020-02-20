@@ -62,6 +62,8 @@ class _DestinationViewState extends State<DestinationView> {
   }
 }
 
+/// Navigationで画面を遷移する際に実行するコールバックを設定するクラス。
+/// まだ未使用。
 class DestinationViewNavigatorObserver extends NavigatorObserver {
   DestinationViewNavigatorObserver(this.onNavigation);
   VoidCallback onNavigation;
@@ -109,23 +111,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Stack _destinationViewStack() => Stack(
-        children: destinations.map((Destination dest) {
-          final Widget view = FadeTransition(
-            opacity: _viewOpacities[dest.index],
-            child: DestinationView(
-              destination: dest,
-              onNavigation: () {},
-            ),
-          );
-          if (dest.index == _selectedIndex) {
-            _viewOpacities[dest.index].forward();
-            return view;
-          }
-          _viewOpacities[dest.index].reverse();
-          return Offstage(child: view);
-        }).toList(),
-      );
+  Stack _destinationViewStack() {
+    // print('build.');
+    // print('selected index : ${_selectedIndex}');
+    return Stack(
+      children: destinations.map((Destination dest) {
+        final Widget view = FadeTransition(
+          opacity: _viewOpacities[dest.index],
+          child: DestinationView(
+            destination: dest,
+            onNavigation: () {},
+          ),
+        );
+        if (dest.index == _selectedIndex) {
+          _viewOpacities[dest.index].forward();
+          return view;
+        }
+        _viewOpacities[dest.index].reverse();
+        return Offstage(child: view);
+      }).toList(),
+    );
+  }
 
   BottomNavigationBar _bottomNavigationBar() => BottomNavigationBar(
         currentIndex: _selectedIndex,
