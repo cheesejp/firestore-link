@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class HugaPage extends StatelessWidget {
+class PiyoPage extends StatelessWidget {
   final String title;
-  HugaPage({this.title = ''});
+  PiyoPage({this.title = ''});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Huga Page'),
+        title: Text('Piyo Page'),
       ),
-      body: Text('This is Huga Page.'),
+      body: Text('This is Piyo Page.'),
     );
   }
 }
